@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, Coffee, Flower2, Sun } from 'lucide-react';
+import { BookOpen, Coffee, Flower2, Scissors, Sun } from 'lucide-react';
 import { FLOWERS } from './data/flowers';
 import { FlowerSpread } from './components/FlowerSpread';
 import { CatalogView } from './components/CatalogView';
 import { PosyStudio } from './components/PosyStudio';
 import { GiftView } from './components/GiftView';
+import { ArrangeView } from './components/ArrangeView';
 import { CoffeeModal } from './components/CoffeeModal';
 import {
   decodePosyFromSearch,
@@ -12,7 +13,7 @@ import {
   PosyPayload,
 } from './utils/posyUrl';
 
-type ViewMode = 'today' | 'catalog' | 'detail' | 'posy' | 'gift';
+type ViewMode = 'today' | 'catalog' | 'detail' | 'posy' | 'arrange' | 'gift';
 
 export default function App() {
   const initialGift = decodePosyFromSearch(window.location.search);
@@ -27,6 +28,8 @@ export default function App() {
     'iris',
   ]);
   const [posyKey, setPosyKey] = useState<number>(0);
+  const [arrangeInitialStems, setArrangeInitialStems] = useState<string[]>([]);
+  const [arrangeKey, setArrangeKey] = useState<number>(0);
   const [giftPayload, setGiftPayload] = useState<PosyPayload | null>(
     initialGift
   );
@@ -37,7 +40,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [view, detailId]);
 
-  const navigateTop = (next: 'today' | 'catalog' | 'posy') => {
+  const navigateTop = (next: 'today' | 'catalog' | 'posy' | 'arrange') => {
     if (window.location.search) {
       window.history.replaceState({}, '', window.location.pathname);
     }
@@ -56,6 +59,18 @@ export default function App() {
     setView('posy');
   };
 
+  const handleComposeWithStems = (ids: string[]) => {
+    setPosyInitialStems(ids.slice(0, 3));
+    setPosyKey((k) => k + 1);
+    setView('posy');
+  };
+
+  const handleArrangeWithFlower = (id: string) => {
+    setArrangeInitialStems([id]);
+    setArrangeKey((k) => k + 1);
+    setView('arrange');
+  };
+
   const handlePreviewGift = (payload: PosyPayload) => {
     setGiftPayload(payload);
     setIsGiftPreview(true);
@@ -71,9 +86,10 @@ export default function App() {
     ];
   const nextFlower = FLOWERS[(activeDetailIndex + 1) % FLOWERS.length];
 
-  const isNavActive = (tab: 'today' | 'catalog' | 'posy') => {
+  const isNavActive = (tab: 'today' | 'catalog' | 'posy' | 'arrange') => {
     if (tab === 'today') return view === 'today';
     if (tab === 'catalog') return view === 'catalog' || view === 'detail';
+    if (tab === 'arrange') return view === 'arrange';
     return view === 'posy' || view === 'gift';
   };
 
@@ -104,6 +120,7 @@ export default function App() {
               [
                 { id: 'today', label: 'Today' },
                 { id: 'catalog', label: 'Catalog' },
+                { id: 'arrange', label: 'Arrange' },
                 { id: 'posy', label: 'Posy' },
               ] as const
             ).map((item) => {
@@ -149,6 +166,7 @@ export default function App() {
               setTodayIndex((idx) => (idx + 1) % FLOWERS.length)
             }
             onComposeWithFlower={handleComposeWithFlower}
+            onArrangeWithFlower={handleArrangeWithFlower}
           />
         )}
 
@@ -162,9 +180,19 @@ export default function App() {
             flower={detailFlower}
             onBackToCatalog={() => setView('catalog')}
             onComposeWithFlower={handleComposeWithFlower}
+            onArrangeWithFlower={handleArrangeWithFlower}
             onSelectSibling={openFlowerDetail}
             prevFlower={prevFlower}
             nextFlower={nextFlower}
+          />
+        )}
+
+        {view === 'arrange' && (
+          <ArrangeView
+            key={arrangeKey}
+            initialFlowerIds={arrangeInitialStems}
+            onOpenFlower={openFlowerDetail}
+            onComposePosyFromStems={handleComposeWithStems}
           />
         )}
 
@@ -223,7 +251,7 @@ export default function App() {
         aria-label="Mobile navigation"
         className="sm:hidden fixed bottom-0 inset-x-0 z-30 bg-[#FCF9F2]/95 backdrop-blur-md border-t border-[#DFD7C6] px-4 py-2"
       >
-        <div className="grid grid-cols-3 gap-1 text-center">
+        <div className="grid grid-cols-4 gap-1 text-center">
           <button
             type="button"
             onClick={() => navigateTop('today')}
@@ -251,6 +279,21 @@ export default function App() {
             <BookOpen className="w-5 h-5 mb-0.5" strokeWidth={1.6} />
             <span className="text-[10px] tracking-[0.16em] uppercase">
               Catalog
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigateTop('arrange')}
+            className={`flex flex-col items-center py-1 rounded-xl transition cursor-pointer ${
+              isNavActive('arrange')
+                ? 'text-[#26221C] font-semibold'
+                : 'text-[#6E6659]'
+            }`}
+          >
+            <Scissors className="w-5 h-5 mb-0.5" strokeWidth={1.6} />
+            <span className="text-[10px] tracking-[0.16em] uppercase">
+              Arrange
             </span>
           </button>
 

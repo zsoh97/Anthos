@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { ChevronLeft, Eye, EyeOff, RotateCw } from 'lucide-react';
+import { ChevronLeft, Eye, EyeOff, RotateCw, Scissors } from 'lucide-react';
 import { Flower } from '../data/flowers';
+import { FLORIST_PROFILE_MAP, ROLE_META } from '../data/arrangements';
 import { formatEditorialDate } from '../utils/posyUrl';
 
 interface FlowerSpreadProps {
@@ -9,6 +10,7 @@ interface FlowerSpreadProps {
   onBackToCatalog?: () => void;
   onCycleToday?: () => void;
   onComposeWithFlower: (id: string) => void;
+  onArrangeWithFlower?: (id: string) => void;
   onSelectSibling?: (id: string) => void;
   prevFlower?: Flower;
   nextFlower?: Flower;
@@ -20,12 +22,14 @@ export function FlowerSpread({
   onBackToCatalog,
   onCycleToday,
   onComposeWithFlower,
+  onArrangeWithFlower,
   onSelectSibling,
   prevFlower,
   nextFlower,
 }: FlowerSpreadProps) {
   const [showPins, setShowPins] = useState(true);
   const [activePinIndex, setActivePinIndex] = useState<number | null>(0);
+  const floristProfile = FLORIST_PROFILE_MAP[flower.id];
 
   const activePin =
     showPins && activePinIndex !== null ? flower.pins[activePinIndex] : null;
@@ -215,6 +219,33 @@ export function FlowerSpread({
               — {flower.epigraphSource}
             </footer>
           </blockquote>
+
+          {/* Quiet "At the Vase" Floristry Note (only for commonly marketed cut stems) */}
+          {floristProfile && (
+            <div className="mt-6 rounded-xl bg-[#FCF9F2] border border-[#DFD7C6] p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-[#EFE9DC]">
+                <span className="inline-flex items-center gap-1.5 text-[10px] tracking-[0.2em] uppercase text-[#6E6659]">
+                  <Scissors className="w-3.5 h-3.5" />
+                  <span>At the Vase · {ROLE_META[floristProfile.role].label}</span>
+                </span>
+                <span className="text-[10.5px] text-[#8A8173]">
+                  {floristProfile.availability} · {floristProfile.vaseLife}
+                </span>
+              </div>
+              <p className="text-[13px] leading-relaxed text-[#4A443A]">
+                {floristProfile.conditioningTip}
+              </p>
+              {onArrangeWithFlower && (
+                <button
+                  type="button"
+                  onClick={() => onArrangeWithFlower(flower.id)}
+                  className="mt-2.5 font-book italic text-[14px] text-[#26221C] underline underline-offset-4 decoration-[#C8BEA9] hover:decoration-[#26221C] transition cursor-pointer"
+                >
+                  Learn how to pair &amp; arrange {flower.name} →
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Quiet Footer Action & Page Turn */}
           <div className="mt-7 pt-5 border-t border-[#DFD7C6] flex flex-wrap items-center justify-between gap-4">
