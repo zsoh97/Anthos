@@ -96,7 +96,7 @@ export default function App() {
   return (
     <div className="min-h-dvh flex flex-col bg-[#F7F3E9] text-[#26221C]">
       {/* Quiet Editorial Header */}
-      <header className="sticky top-0 z-30 bg-[#F7F3E9]/92 backdrop-blur-md border-b border-[#DFD7C6]">
+      <header className="sticky top-0 z-30 bg-[#F7F3E9]/92 backdrop-blur-md border-b border-[#DFD7C6] pt-[env(safe-area-inset-top)]">
         <div className="max-w-6xl mx-auto px-5 sm:px-8 py-3.5 sm:py-4 flex items-center justify-between gap-4">
           <button
             type="button"
@@ -156,7 +156,7 @@ export default function App() {
       </header>
 
       {/* Main Content Area (extra bottom padding on mobile for bottom tab bar) */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-10 pb-24 sm:pb-14">
+      <main className="flex-1 w-full max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-10 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pb-14">
         {view === 'today' && (
           <FlowerSpread
             key={`today-${FLOWERS[todayIndex].id}`}
@@ -249,7 +249,7 @@ export default function App() {
       {/* Reactive Mobile Bottom Navigation Bar (visible on phone widths) */}
       <nav
         aria-label="Mobile navigation"
-        className="sm:hidden fixed bottom-0 inset-x-0 z-30 bg-[#FCF9F2]/95 backdrop-blur-md border-t border-[#DFD7C6] px-4 py-2"
+        className="sm:hidden fixed bottom-0 inset-x-0 z-30 bg-[#FCF9F2]/95 backdrop-blur-md border-t border-[#DFD7C6] px-4 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
       >
         <div className="grid grid-cols-4 gap-1 text-center">
           <button
